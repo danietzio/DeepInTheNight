@@ -9,14 +9,19 @@
 #include <QObject>
 #include <QWidget>
 #include "enemy.h"
-class game : public QGraphicsView {
+#include <QMediaPlayer>
+#include <health.h>
+class game :  public QGraphicsView {
 public :
     game();
+    ~game();
     QGraphicsScene *scene;
     map *_map;
+   // enemy *Enemy;
     player *Player;
-    enemy *Enemy;
+    //enemy *Enemy;
     int y0 = 0;
+    QMediaPlayer  *media;
 };
 
 

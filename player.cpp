@@ -12,9 +12,11 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QEvent>
-extern int y00;
 static int time;
-player::player(QGraphicsView *v,enemy *e)
+int x_player,y_player;
+bool mark_ctrl_player;
+bool health_enemy_decrease;
+player::player(QGraphicsView *v,QGraphicsScene *_Scene)
 {
     /*sprite = new QImage(":/new/img/F:/Qt/Poroje/SPRITE/main character/walk/right.png");
     setPixmap(QPixmap::fromImage(sprite->copy(flap_sprite_x,0,sprite->width() / 9,130)));*/
@@ -26,9 +28,16 @@ player::player(QGraphicsView *v,enemy *e)
     if(mark == true) { timer->start(10);}
     else timer->stop();
 
-    Enemy = e;
+    Scene = _Scene;
+
+    Health = new health(100);
+    Scene->addItem(Health);
+
+    li = collidingItems();
 }
 int player::speed = 3;
+int player::speed_down = 2;
+
 void player::keyReleaseEvent(QKeyEvent * event)
 {
     if(event->key() == Qt::Key_Right && barkhord == true && barkhord1 == true )  {
@@ -36,12 +45,16 @@ void player::keyReleaseEvent(QKeyEvent * event)
         mark = false;
         right_realesed = true;
         right_pressed = false;
+        mark_shift = false;
+        mark_ctrl = false;
     }
     if(event->key() == Qt::Key_Left && barkhord == true && barkhord1 == true) {
         mark_l = false;
         mark = false;
         left_realesed   = true;
         left_pressed = false;
+        mark_shift = false;
+        mark_ctrl = false;
     }
     if(event->key() == Qt::Key_Shift && barkhord == true && barkhord1 == true) {
         speed = 3;
@@ -55,6 +68,30 @@ void player::keyReleaseEvent(QKeyEvent * event)
 
 }
 
+bool player::checkCollision()
+{
+    li = collidingItems();
+    if(!li.empty()) {
+        collied_with_enemy = true;
+        return true;
+    }
+    else {
+        collied_with_enemy = false;
+        return false;
+    }
+}
+
+void player::checkHealth()
+{
+    if((*Health) < 0) { this->deleteLater(); return; }
+    if(collied_with_enemy == true && mark_ctrl == true && mark_ctrl_enemy == false) {
+        health_enemy_decrease = true;
+    }
+    else health_enemy_decrease = false;
+    if(health_player_decrease == true)Health->set_Health(20);
+
+}
+
 void player::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_Right && barkhord1 == true && barkhord == true) {
@@ -64,8 +101,10 @@ void player::keyPressEvent(QKeyEvent *event)
         right_realesed = false;
         turn_right = true;
         turn_left = false;
+        mark_shift = false;
+        mark_ctrl = false;
     }
-    if(event->key() == Qt::Key_Shift && barkhord == true && barkhord1 == true) {
+    if(event->key() == Qt::Key_Shift && barkhord == true && barkhord1 == true && mark_ctrl == false) {
         speed = 5;
         mark_shift = true;
     }
@@ -76,23 +115,34 @@ void player::keyPressEvent(QKeyEvent *event)
         left_realesed = false;
         turn_left = true;
         turn_right = false;
+        mark_shift = false;
+        mark_ctrl = false;
     }
    if (event->key() == Qt::Key_Space )  {
         static int count = 0;
         if(count ==0) { basey0 = y0; count++;}
         mark_s = true;
         mark = true;
+        mark_shift = false;
+        mark_ctrl = false;
         if(left_pressed == true) {mark_l = true;mark_r = false;}
         else if(right_pressed == true) {mark_r = true;mark_l = false;}
         else { mark_r = false;mark_l = false;}
         barkhord1 = false;
         barkhord = false;
     }
-   if(event->key() == Qt::Key_Down && barkhord1 == true && barkhord == true) {
+   if(event->key() == Qt::Key_Down && barkhord1 == true && barkhord == true && mark_shift == false) {
        time += 10;
-       if ( time < 300 ) { mark_ctrl = true; speed = 7;}
-       if ( time > 600) { time = 0;}
-
+       if ( time < 300 ) {
+           mark_ctrl = true;
+           speed = 7;
+       }
+       else if ( time < 600 ) {
+           mark_ctrl = false;
+           speed = 3;}
+       if ( time > 600) {
+           time = 0;
+       }
    }
 }
 
@@ -143,174 +193,234 @@ void player::moveup()
 
 void player::movedown()
 {
-    setPos(x(),y() + 2);
+    setPos(x(),y() + speed_down);
 }
 
 player::~player()
 {
-    delete timer;
-    deleteLater();
+    x_player = -1;
+    y_player = -1;
+    Health->deleteLater();
+    timer->deleteLater();
+    this->deleteLater();
 }
+
+//player::~player()
+//     {
+//    view->deleteLater();
+//   Scene->deleteLater();
+//    Health->deleteLater();
+//    timer->deleteLater();
+//    deleteLater();
+//}
 void player::move() {
     //Set ScrollBar
-    if(x() > 800)view->horizontalScrollBar()->setValue(x() - 800);
+    //qDebug() << x();
+    if(x() > 400)view->horizontalScrollBar()->setValue(x() - 400);
     //view->setHorizontaalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //view->setHorizontalScrollBar((Qt::ScrollBarAlwaysOff);
     //view->setVertic
     //MoveMent CoorDinates
    if(x() >=  0 && x() < 500) {
-        if(barkhord == true && barkhord1 == true)setPos(x(),651);
+        if(barkhord == true && barkhord1 == true)setPos(x(),640);
         setRotation(0);
-        y0 = 651;
+        y0 = 640;
     }
     if(x() >= 500 && x() < 790 ) {
-        if(barkhord1 == true)setPos(x(),((float)4.01/15)*(x() - 500) + 651);
+        if(barkhord1 == true)setPos(x(),((float)4.01/15)*(x() - 500) + 610);
         setRotation(qreal(qAtan(((float)4.01/ 15))  * 180 / PI));
-        y0 = (float)(4.01/15)*(x() - 500) + 651;
+        y0 = (float)(4.01/15)*(x() - 500) + 610;
 
     }
     if(x() >= 790 && x() < 990 ) {
-        if(barkhord == true && barkhord1 == true)setPos(x(),731);
+        if(barkhord == true && barkhord1 == true)setPos(x(),670);
         setRotation(0);
-        y0 = 731;
+        y0 = 670;
 
     }
     if(x() >= 990 && x() < 1090 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/5))*(x() - 1000) + 731);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/5))*(x() - 1000) + 670);
         setRotation(qreal(qAtan(((float)(-1.01/ 5)))  * 180 / PI));
-        y0 = (((float)(-1.01/5))*(x() - 1000) + 731);
+        y0 = (((float)(-1.01/5))*(x() - 1000) + 670);
 
     }
     if(x() >= 1090 && x() < 1190 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/10))*(x() - 1100) + 711);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/10))*(x() - 1100) + 650);
         setRotation(qreal(qAtan(((float)(-1.01/ 10)))  * 180 / PI));
-        y0 = (((float)(-1.01/10))*(x() - 1100) + 711);
+        y0 = (((float)(-1.01/10))*(x() - 1100) + 650);
 
     }
     if(x() >= 1190 && x() < 1390 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/20))*(x() - 1200) + 701);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/20))*(x() - 1200) + 640);
         setRotation(qreal(qAtan(((float)(1.01/20)))  * 180 / PI));
-        y0 = ((float)(1.01/20))*(x() - 1200) + 701;
+        y0 = ((float)(1.01/20))*(x() - 1200) + 640;
 
     }
     if(x() >= 1390 && x() < 1590 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/20))*(x() - 1400) + 711);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/20))*(x() - 1400) + 650);
         setRotation(qreal(qAtan(((float)(-1.01/20)))  * 180 / PI));
-        y0 = ((float)(-1.01/20))*(x() - 1400) + 711;
+        y0 = ((float)(-1.01/20))*(x() - 1400) + 650;
 
     }
     if(x() >= 1590 && x() < 1990 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/40))*(x() - 1600) + 701);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/40))*(x() - 1600) + 640);
         setRotation(qreal(qAtan(((float)(1.01/40)))  * 180 / PI));
-        y0 = ((float)(1.01/40))*(x() - 1600) + 701;
+        y0 = ((float)(1.01/40))*(x() - 1600) + 640;
 
     }
     if(x() >= 1990 && x() < 2490 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/50))*(x() - 2000) + 711);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-1.01/50))*(x() - 2000) + 650);
         setRotation(qreal(qAtan(((float)(-1.01/50)))  * 180 / PI));
-        y0 = ((float)(-1.01/50))*(x() - 2000) + 711;
+        y0 = ((float)(-1.01/50))*(x() - 2000) + 650;
 
     }
     if(x() >= 2490 && x() < 2890 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/40))*(x() - 2500) + 701);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(1.01/40))*(x() - 2500) + 660);
         setRotation(qreal(qAtan(((float)(1.01/40)))  * 180 / PI));
-        y0 = ((float)(1.01/40))*(x() - 2500) + 701;
+        y0 = ((float)(1.01/40))*(x() - 2500) + 660;
 
     }
     if(x() >= 2890 && x() < 2990 ) {
 
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-2.01/10))*(x() - 2900) + 711);
-        setRotation(qreal(qAtan(((float)(-2.01/10)))  * 180 / PI));
-        y0 = ((float)(-2.01/10))*(x() - 2900) + 711;
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(+2.01/10))*(x() - 2900) + 650);
+        setRotation(qreal(qAtan(((float)(+2.01/10)))  * 180 / PI));
+        y0 = ((float)(+2.01/10))*(x() - 2900) + 650;
 
     }
     if(x() >= 2990 && x() < 3140 ) {
 
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(2.01/15))*(x() - 3000) + 691);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(2.01/15))*(x() - 3000) + 650);
         setRotation(qreal(qAtan(((float)(2.01/15)))  * 180 / PI));
-        y0 = ((float)(2.01/15))*(x() - 3000) + 691;
+        y0 = ((float)(2.01/15))*(x() - 3000) + 650;
 
     }
     if(x() >= 3140 && x() < 3320 ) {
-        if(barkhord1 == true && barkhord == true)setPos(x(),711);
+        if(barkhord1 == true && barkhord == true)setPos(x(),680);
         setRotation(0);
-        y0 = 711;
+        y0 = 680;
     }
     if(x() >= 3320 && x() < 3490 ) {
 
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-6.01/17))*(x() - 3330) + 711);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-6.01/17))*(x() - 3330) + 660);
         setRotation(qreal(qAtan(((float)(-6.01/17)))  * 180 / PI));
-        y0 = ((float)(-6.01/17))*(x() - 3330) + 711;
+        y0 = ((float)(-6.01/17))*(x() - 3330) + 660;
     }
     if(x() >= 3490 && x() < 4420 ) {
-        if(barkhord1 == true && barkhord == true)setPos(x(),651);
+        if(barkhord1 == true && barkhord == true)setPos(x(),565);
         setRotation(0);
-        y0 = 651;
+        y0 = 565;
     }
-    if(x() >= 4420 && x() < 4740 ) {
-            static int count = 0;
+    if(x() >= 4420 && x() < 4730 ) {
+           /* static int count = 0;
+            static int _y0 = 0;
+            if(x() > 4450)y0 = 1024;
+            if(x() > 4720 && x() < 4730 && y() > 500) { mark_l = false;mark_r = false;mark = false;mark_d = true;}
+            else if(y() >= 563 && y() <= 568 && x() < 4450 && count == 0){_y0 = 565;count++;}
+            else if(y() >= 482 && y() <= 488 && x() > 4700 && count == 0){_y0 = 485;count++;}
+
+            if(_y0 == 565){
+               mark_r = true;mark = true;mark_l = false;
+            }
+            if(_y0 == 485){
+               mark_l = true;mark = true;mark_r = false;
+            }
+            if(y() > 900) {
+                count = 0;
+           // this->deleteLater();
+            //view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            mark_r = false;mark = false;mark_l = false;
+
+            }
+            if(_y0 == 565 && x() > 4350){setPos(x(), (0.7 * (x() - 4420)*(x() - 4420) / 150) + 565 );}
+            if(_y0 == 580 && x() < 4350)setPos(x(),580);
+            if(_y0 == 485){setPos(x(), (2 *  (-x() + 4730)*(-x() + 4730) / 150) + 485 );}*/
+            if(y() >= 565 && turn_right == true && turn_left == false){
+                speed_down = 8 ;
+                mark_d = true;
+                mark = true;
+                mark_r = true;
+            }
+            if(y() >= 485 && turn_right == false && turn_left == true){
+                speed_down = 8 ;
+                mark_d = true;
+                mark = true;
+                mark_l = true;
+            }
+            if(y() > 900) {
+                this->deleteLater();
+                    speed_down = 4 ;
+                    mark_d = false;
+                    mark = false;
+                    mark_r = false;
+                    mark_l = true;
+                    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            }
+    }
+
+    if(x() >= 4730 && x() < 4850 ) {
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-2.01/18))*(x() - 4730) + 495);
+        setRotation(qreal(qAtan(((float)(-2.01/18)))  * 180 / PI));
+        y0 = ((float)(-2.01/18))*(x() - 4730) + 495;
+
+    }
+    if(x() >= 4850 && x() < 5270 ) {
+           /* static int count = 0;
             static int _y0 = 0;
             y0 = 1024;
-
-            if(y() >= 649 && y() <= 652 && count == 0){_y0 = 651;count++;}
-            if(y() >= 569 && y() <= 573 && count == 0){_y0 = 571;count++;}
-            mark_r = true;mark = true;
-            if(y() > 950){
-               count = 0;
-            this->~player();
-            view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-            mark_r = false;mark = false;
-
+            if(y() >= 483 && y() <= 487 && count == 0){_y0 = 485;count++;}
+            if(y() >= 420 && y() <=  428 && count == 0){_y0 = 425 ;count++;}
+            if(_y0 == 485){
+                mark_r = true;mark = true;mark_l = false;
             }
-            if(_y0 == 651){setPos(x(), (0.7 * (x() - 4420)*(x() - 4420) / 150) + 651 );}
-            if(_y0 == 571){setPos(x(), (2 *  (-x() + 4740)*(-x() + 4740) / 150) + 571 );}
-
-    }
-    if(x() >= 4740 && x() < 4910 ) {
-
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-2.01/18))*(x() - 4740) + 571);
-        setRotation(qreal(qAtan(((float)(-2.01/18)))  * 180 / PI));
-        y0 = ((float)(-2.01/18))*(x() - 4740) + 571;
-
-    }
-    if(x() >= 4910 && x() < 5270 ) {
-            static int count = 0;
-            static int _y0 = 0;
-             if(x() >= 4910 && x() < 4930 ) {
-                 y0 = ((float)(-21.01/2))*(x() - 4920) + 551;
-             }
-             else if(x() >= 4930 && x() < 4945 ) {
-                y0 = ((float)(150.01/10))*(x() - 4940) + 760;
-             }
-             else y0 = 1024;
-            if(y() >= 549 && y() <= 554 && count == 0){_y0 = 551;count++;}
-            if(y() >= 509 && y() <= 514 && count == 0){_y0 = 511;count++;}
-            mark_r = true;mark = true;
-
-            if(y() > 950){
+            if(_y0 == 425) {
+                mark_l = true;mark = true;mark_r = false;
+            }
+            if(y() > 900) {
                 count = 0;
-           // this->~player();
+             //   mark_r = false;mark = false;mark_l = false;
+           // this->deleteLater();
            // view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
             }
-            if(_y0 == 551){setPos(x(), (0.7 * (x() - 4910)*(x() - 4910)/ 150) + 551 );}
-            if(_y0 == 511){setPos(x(), (2 * (-x() + 5270)*(-x() + 5270) / 220) + 511 );}
+            if(_y0 == 485){setPos(x(), (0.7 * (x() - 4850)*(x() - 4850)/ 150) + 485 );}
+            if(_y0 == 425){setPos(x(), (2 * (-x() + 5270)*(-x() + 5270) / 220) + 425 );}*/
+        if(y() >= 480 && turn_right == true && turn_left == false){
+            speed_down = 8 ;
+            mark_d = true;
+            mark = true;
+            mark_r = true;
+        }
+        if(y() >= 424 && turn_right == false && turn_left == true){
+            speed_down = 8 ;
+            mark_d = true;
+            mark = true;
+            mark_l = true;
+        }
+        if(y() > 900) {
+            this->deleteLater();
+                speed_down = 4 ;
+                mark_d = false;
+                mark = false;
+                mark_r = false;
+                mark_l = true;
+                view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
 
      }
+    qDebug() << x() << y() << y0;
 
-    if(x() >= 5270 && x() < 5640 ) {
-
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-5.01/37))*(x() - 5260) + 511);
+    if(x() >= 5270 && x() < 5580 ) {
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-5.01/37))*(x() - 5270) + 435);
         setRotation(qreal(qAtan(((float)(-5.01/37)))  * 180 / PI));
-        y0 = ((float)(-5.01/37))*(x() - 5260) + 511;
+        y0 = ((float)(-5.01/37))*(x() - 5270) + 435;
     }
-    if(x() >= 5640 && x() < 6040 ) {
-             static int count = 0;
+    if(x() >= 5580 && x() < 6115 ) {
+            /* static int count = 0;
              static int _y0 = 0;
               if(x() >= 5640 && x() < 5740 ) {
                   y0 = ((float)(524.01/100))*(x() - 5640) + 461;
               }
               else y0 = 1024;
-             if(y() >= 459 && y() <= 465 && count == 0){_y0 = 461;count++;}
+             if(y() >= 421 && y() <= 428 && count == 0){_y0 = 425;count++;}
              if(y() >= 653 && y() <= 457 && count == 0){_y0 = 656;count++;}
              mark_r = true;mark = true;
 
@@ -319,24 +429,40 @@ void player::move() {
             // this->~player();
             // view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
              }
-             if(_y0 == 461){setPos(x(), (2 * (x() - 5640)*(x() - 5640)/ 220) + 461 );}
-             if(_y0 == 656){setPos(x(), (2 * (-x() + 6040)*(-x() + 6040) / 220) + 656 );}
+             if(_y0 == 425){setPos(x(), (2 * (x() - 5640)*(x() - 5640)/ 220) + 425 );}
+             if(_y0 == 656){setPos(x(), (2 * (-x() + 6040)*(-x() + 6040) / 220) + 656 );}*/
+        y0 = 1024;
+        if(y() >= 385 && x() < 5800 && turn_right == true && turn_left == false){
+            speed_down = 8 ;
+            mark_d = true;
+            mark = true;
+            mark_r = true;
+        }
+        if(y() >= 558 &&  turn_left == true){
+            speed_down = 8 ;
+            mark_d = true;
+            mark = true;
+            mark_l = true;
+        }
+        if(y() > 900) {
+            this->deleteLater();
+                speed_down = 4 ;
+                mark_d = false;
+                mark = false;
+                mark_r = false;
+                mark_l = true;
+                view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
 
      }
-
-    if(x() >= 6040 && x() < 6105 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-329.01/65))*(x() - 6040) + 985);
-        setRotation(qreal(qAtan(((float)(-329.01/65)))  * 180 / PI));
-        y0 = ((float)(-329.01/65))*(x() - 6040) + 985;
-    }
-    if(x() >= 6105 && x() < 6290 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(+15.01/185))*(x() - 6115) + 656);
+    if(x() >= 6115 && x() < 6260 ) {
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(+15.01/185))*(x() - 6115) + 570);
         setRotation(qreal(qAtan(((float)(+15.01/185)))  * 180 / PI));
-        y0 = ((float)(+15.01/185))*(x() - 6115) + 656;
+        y0 = ((float)(+15.01/185))*(x() - 6115) + 570;
     }
 
-   if(x() >= 6260 && x() < 6380 ) {
-             static int count = 0;
+   if(x() >= 6260 && x() < 6300 ) {
+            /* static int count = 0;
              static int _y0 = 0;
                 if(x() >= 6260 && x() < 6290 ) {
                     y0 = ((float)(314.01/30))*(x() - 6270) + 985;
@@ -355,16 +481,18 @@ void player::move() {
             // view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
              }
              if(_y0 == 671){setPos(x(), (0.5 * (x() - 6270)*(x() - 6270)/ 220) + 671 );}
-             if(_y0 == 761){setPos(x(), (2 * (-x() + 6363)*(-x() + 6363) / 220) + 761 );}
+             if(_y0 == 761){setPos(x(), (2 * (-x() + 6363)*(-x() + 6363) / 220) + 761 );}*/
+            if(y() > 581 && turn_right == true){ mark_r = true;mark_d = true;}
+
      }
 
-    if(x() >= 6380 && x() < 6510 ) {
-        if(barkhord1 == true && barkhord == true)setPos(x(),760);
+    if(x() >= 6300 && x() < 6510 ) {
+        if(barkhord1 == true && barkhord == true)setPos(x(),671);
         setRotation(0);
-        y0 = 760;
+        y0 = 671;
     }
     if(x() >= 6510 && x() < 6920 ) {
-              static int count = 0;
+           /*   static int count = 0;
               static int _y0 = 0;
                      if(x() >= 6900 && x() < 6920 ) {
                           y0 = ((float)(-329.01/20))*(x() - 6910) + 656;
@@ -372,7 +500,6 @@ void player::move() {
                     else y0 = 1024;
               if(y() >= 758 && y() <= 763 && count == 0){_y0 = 761;count++;}
               if(y() >= 652 && y() <= 660 && count == 0){_y0 = 656;count++;}
-              mark_r = true;mark = true;
 
               if(y() > 950){
                  count = 0;
@@ -381,12 +508,14 @@ void player::move() {
               }
               if(_y0 == 761){setPos(x(), (0.5 * (x() - 6510)*(x() - 6510)/ 220) + 761 );}
               if(_y0 == 656){setPos(x(), (2 * (-x() + 6920)*(-x() + 6920) / 220) + 656 );}
+              */
+
         }
 
     if(x() >= 6920 && x() < 7075 ) {
-        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-10.01/175)*(x() - 6910)) + 656);
+        if((barkhord1 == true && barkhord == true))setPos(x(),((float)(-10.01/175)*(x() - 6910)) + 600);
         setRotation(qreal(qAtan(((float)(-10.01/175)))  * 180 / PI));
-        y0 = ((float)(-10.01/175))*(x() - 6910) + 656;
+        y0 = ((float)(-10.01/175))*(x() - 6910) + 600;
     }
     if(x() >= 7045 && x() < 7420 ) {
               static int count = 0;
@@ -927,7 +1056,7 @@ void player::move() {
            static int counter_fight_right = 0;
            static int counter_fight_left = 0;
            counter1++;
-        if(counter1 % 10 == 0 && mark_r == true && mark == true && mark_l == false
+        if(counter1 % 10 == 0 && speed_down != 8 && mark_r == true && mark == true && mark_l == false
                 && barkhord == true && barkhord1 == true && mark_shift == false && mark_ctrl == false) {
 
          switch(counter_right_walk % 9) {
@@ -970,7 +1099,7 @@ void player::move() {
              break;
              }
         }
-        else if(counter1 % 10 == 0 && mark_l == true && mark == true && mark_r == false
+        else if(counter1 % 10 == 0 && speed_down != 8 && mark_l == true && mark == true && mark_r == false
                 && barkhord == true && barkhord1 == true && mark_shift == false && mark_ctrl == false) {
          switch(counter_left_walk % 9) {
            case 0:
@@ -1012,7 +1141,7 @@ void player::move() {
              break;
              }
         }
-       else  if(counter1 % 15 == 0  && mark_l == false && mark_r == false && mark == false &&
+       else  if(counter1 % 15 == 0 && speed_down != 8  && mark_l == false && mark_r == false && mark == false &&
                 barkhord == true && barkhord1 == true && turn_right == true && turn_left == false) {
             switch(counter_idle_right % 9) {
               case 0:
@@ -1042,7 +1171,7 @@ void player::move() {
                  break;
                 }
         }
-        else if(counter1 % 15 == 0 && mark_l == false && mark_r == false && mark == false
+        else if(counter1 % 15 == 0 && speed_down != 8 && mark_l == false && mark_r == false && mark == false
            && barkhord == true && barkhord1 == true && turn_left == true && turn_right == false) {
             switch(counter_idle_left % 9) {
               case 0:
@@ -1072,7 +1201,7 @@ void player::move() {
                  break;
                 }
             }
-        else if(counter1 % 10 == 0 && mark_l == false && mark_r == false && mark_s == true && barkhord == false
+        else if(counter1 % 10 == 0 && speed_down != 8 && mark_l == false && mark_r == false && mark_s == true && barkhord == false
                 && barkhord1 == false && turn_right == true) {
          switch(counter_jump_idle_right % 9) {
            case 0:
@@ -1108,7 +1237,7 @@ void player::move() {
              break;
              }
         }
-         else if(counter1 % 10 == 0 && mark_l == false && mark_r == false && mark_s == true && barkhord == false
+         else if(counter1 % 10 == 0 && speed_down != 8 && mark_l == false && mark_r == false && mark_s == true && barkhord == false
                  && barkhord1 == false && turn_left == true) {
           switch(counter_jump_idle_left % 9) {
             case 0:
@@ -1144,7 +1273,7 @@ void player::move() {
               break;
               }
         }
-        else if(counter1 % 10 == 0 && mark_l == false && mark_r == true && mark_s == true && barkhord == false
+        else if(counter1 % 10 == 0 && speed_down != 8 && mark_l == false && mark_r == true && mark_s == true && barkhord == false
                 && barkhord1 == false && turn_right == true) {
          switch(counter_jump_right % 9) {
            case 0:
@@ -1174,7 +1303,7 @@ void player::move() {
              break;
             }
         }
-         else if(counter1 % 10 == 0 && mark_l == true && mark_r == false && mark_s == true && barkhord == false
+         else if(counter1 % 10 == 0 && speed_down != 8 && mark_l == true && mark_r == false && mark_s == true && barkhord == false
                  && barkhord1 == false && turn_left == true) {
           switch(counter_jump_left % 9) {
             case 0:
@@ -1204,7 +1333,7 @@ void player::move() {
               break;
              }
          }
-        else if(counter1 % 8 == 0 && mark_l == false && mark_r == true && mark_shift == true
+        else if(counter1 % 8 == 0 && speed_down != 8 && mark_l == false && mark_r == true && mark_shift == true
                 && barkhord == true && barkhord1 == true && turn_right == true && mark_ctrl == false) {
             switch(counter_right_run % 9) {
               case 0:
@@ -1246,7 +1375,7 @@ void player::move() {
                 break;
                 }
              }
-        else if(counter1 % 8 == 0 && mark_l == true && mark_r == false && mark_shift == true
+        else if(counter1 % 8 == 0 && speed_down != 8 && mark_l == true && mark_r == false && mark_shift == true
                 && barkhord == true && barkhord1 == true && turn_left == true  && mark_ctrl == false) {
             switch(counter_left_run % 9) {
               case 0:
@@ -1288,7 +1417,7 @@ void player::move() {
                 break;
                 }
              }
-        else if(counter1 % 10 == 0 && mark_r == true && mark == true && mark_l == false && turn_right == true
+        else if(counter1 % 10 == 0 && speed_down != 8 && mark_r == true && mark == true && mark_l == false && turn_right == true
                 && barkhord == true && barkhord1 == true &&  mark_ctrl == true && mark_shift == false) {
 
          switch(counter_fight_right % 9) {
@@ -1323,7 +1452,7 @@ void player::move() {
              break;
              }
         }
-        else if(counter1 % 8 == 0 && mark_r == false && mark == true && mark_l == true && turn_left == true
+        else if(counter1 % 8 == 0  && speed_down != 8&& mark_r == false && mark == true && mark_l == true && turn_left == true
                 && barkhord == true && barkhord1 == true && mark_ctrl == true && mark_shift == false) {
 
          switch(counter_fight_left % 9) {
@@ -1358,13 +1487,21 @@ void player::move() {
              break;
              }
         }
+        else if(counter1 % 8 == 0 && mark_d == true && mark_r == true && mark == true && speed_down == 8) {
+                  setPixmap(QPixmap(":/new/jump_right_idle/F:/Qt/Poroje/SPRITE/main character/jump/right_idle/4.png"));
+        }
+        else if(counter1 % 8 == 0 && mark_d == true && mark_l == true && mark == true && speed_down == 8) {
+                  setPixmap(QPixmap(":/new/jump_left_idle/F:/Qt/Poroje/SPRITE/main character/jump/left_idle/4.png"));
+        }
                 //Move ProPerties
 
         if((mark == true && mark_r == true)) {
                moveright();
+               mark_l = false;
         }
         if((mark == true && mark_l == true)) {
                moveleft();
+               mark_r = false;
         }
         if(mark_d == true) {
                movedown();
@@ -1377,7 +1514,7 @@ void player::move() {
             static float g = 7.5;
             static float x0;
                 g  -= 0.1;
-                if(g > 0){ going_down = false ; going_up = true;}
+                if(g > 0){going_down = false ; going_up = true;}
                 else { going_down = true ; going_up = false; }
             if(count == 0) {
                 x0 = x();
@@ -1385,7 +1522,6 @@ void player::move() {
             }
             if(mark_l == false && mark_r == false)setPos(x0,y() - g);
             else setPos(x(),y() - g);
-                qDebug() << x() << y0 << y();
 
             if(y() > y0) {
                  count = 0;
@@ -1397,11 +1533,24 @@ void player::move() {
                  mark = false;
                  mark_d = false;
                  mark_u = false;
+                 mark_shift = false;
+                 mark_ctrl = false;
+                 left_pressed = false;
+                 right_pressed = false;
+
                  g = 7.5;
                }
         }
-        //Send CoorDinates Of Player To Enemy
-        Enemy->getPlayerCoordinate(x(),y());
-    y00 = y0;
+        //SetHealthPos
+        Health->set_pos(x() + 10,y() - 40);
+        //Check Health
+        checkHealth();
 
+        //Check Collision
+        checkCollision();
+
+        //set x_player,y_player
+        x_player = x();
+        y_player = y();
+        mark_ctrl_player = mark_ctrl;
 }

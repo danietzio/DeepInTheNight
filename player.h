@@ -9,10 +9,16 @@
 #include <QSet>
 #include <QImage>
 #include <enemy.h>
+#include <QList>
+#include <health.h>
+#include <QGraphicsScene>
+extern bool mark_ctrl_enemy;
+extern bool health_player_decrease;
+
 class player : public QObject , public QGraphicsPixmapItem {
     Q_OBJECT
 public:
-    player(QGraphicsView *v,enemy *e);
+    player(QGraphicsView *v,QGraphicsScene *_Scene);
 
 
     int getx();
@@ -20,8 +26,7 @@ public:
 
     QTimer *timer;
     QGraphicsView *view;
-    QImage *sprite;
-    QPixmap *player_sprite;
+    QGraphicsScene *Scene;
     bool barkhord = true;
     bool barkhord1 = true;
     bool mark_r = false;
@@ -41,17 +46,19 @@ public:
     bool going_up = false;
     bool going_down = false;
     bool ctrl_released = true;
+    bool collied_with_enemy = false;
     int basey0 = 0;
     int y0 = 0;
     int flap_sprite_x = 0;
-    static int speed;
-    enemy *Enemy;
-
+    static int speed,speed_down;
+    health *Health;
+    QList<QGraphicsItem *> li;
 
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-
+    bool checkCollision();
+    void checkHealth();
     static int getSpeed();
     static void setSpeed(int value);
     void moveright();
@@ -64,6 +71,9 @@ public:
 protected slots:
     void move();
 };
+
+
+
 
 
 #endif // PLAYER_H
