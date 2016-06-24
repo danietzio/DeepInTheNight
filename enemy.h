@@ -3,20 +3,32 @@
 #include <QGraphicsRectItem>
 #include <QObject>
 #include <QTimer>
-class enemy :  public QObject , public QGraphicsRectItem  {
+#include <QPixmap>
+#include <QGraphicsPixmapItem>
+#include <QList>
+#include "health.h"
+#include <player.h>
+#include <QGraphicsScene>
+extern bool mark_ctrl_player;
+extern bool health_enemy_decrease;
+extern int x_player;
+extern int y_player;
+class enemy :  public QObject , public QGraphicsPixmapItem  {
     Q_OBJECT
 public:
-    enemy();
+    enemy(QGraphicsScene *_Scene);
     int getx();
     int gety();
     void getPlayerCoordinate(qreal x,qreal y);
-    ~enemy();
+    void checkHealth();
 
 private:
     QTimer *timer;
     QGraphicsView *view;
-    QImage *sprite;
-    QPixmap *player_sprite;
+
+    QList<QGraphicsItem *> li;
+    health *Health;
+    QGraphicsScene *Scene;
     bool barkhord = true;
     bool barkhord1 = true;
     bool mark_r = false;
@@ -32,11 +44,13 @@ private:
     bool right_pressed = false;
     bool right_realesed = false;
     bool left_realesed = false;
-    bool turn_left = true;
-    bool turn_right = true;
+    bool turn_left = false;
+    bool turn_right = false;
     bool going_up = false;
     bool going_down = false;
     bool ctrl_released = true;
+    bool collied_with_player = false;
+
     int basey0 = 0;
     int y0 = 0;
     static int speed;
@@ -46,6 +60,7 @@ private:
     float calculateDistance();
     void moveright();
     void moveleft();
+    bool checkCollision();
 protected slots:
     void move();
 };

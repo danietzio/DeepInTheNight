@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/new/img">
-        <file>F:/Qt/Poroje/backg1.jpg</file>
-        <file>F:/Qt/Poroje/backg1 (2).jpg</file>
+        <file>F:/Qt/Poroje/BACKGROUND.jpg</file>
     </qresource>
     <qresource prefix="/new/idle">
         <file>F:/Qt/Poroje/SPRITE/main character/idle/idle_right/1.png</file>
@@ -106,5 +105,102 @@
         <file>F:/Qt/Poroje/SPRITE/main character/fighter/left/5.png</file>
         <file>F:/Qt/Poroje/SPRITE/main character/fighter/left/6.png</file>
         <file>F:/Qt/Poroje/SPRITE/main character/fighter/left/7.png</file>
+    </qresource>
+    <qresource prefix="/new/enemy_suspection">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/ready-to-fight/SUSPECTED/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/ready-to-fight/SUSPECTED/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/ready-to-fight/SUSPECTED/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/ready-to-fight/SUSPECTED/4.png</file>
+    </qresource>
+    <qresource prefix="/new/enemy_left_walk">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/7.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/8.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Left/9.png</file>
+    </qresource>
+    <qresource prefix="/new/enemy_right_walk">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/7.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/8.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/walk/Right/9.png</file>
+    </qresource>
+    <qresource prefix="/new/fight_left_enemy">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/left/7.png</file>
+    </qresource>
+    <qresource prefix="/new/fight_right_enemy">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/fighter/Right/7.png</file>
+    </qresource>
+    <qresource prefix="/new/idle_right_enemy">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Right/6.png</file>
+    </qresource>
+    <qresource prefix="/new/left_enemt">
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/ENEMY/idle/Left/6.png</file>
+    </qresource>
+    <qresource prefix="/new/Music">
+        <file>F:/Qt/Poroje/SPRITE/02. Intervention Of The Gods.mp3</file>
+    </qresource>
+    <qresource prefix="/new/bat">
+        <file>F:/Qt/Poroje/SPRITE/BAT/left/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/BAT/left/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/BAT/left/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/BAT/left/4.png</file>
+    </qresource>
+    <qresource prefix="/new/Health">
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/0.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/7.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/8.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/9.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Blue/10.png</file>
+    </qresource>
+    <qresource prefix="/new/score">
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/0.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/1.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/2.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/3.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/4.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/5.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/6.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/7.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/8.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/9.png</file>
+        <file>F:/Qt/Poroje/SPRITE/progressBar/Red/10.png</file>
     </qresource>
 </RCC>
